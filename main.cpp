@@ -2,9 +2,10 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include <list>
 #include "PriorityQueue.h"
 
-// This class contains the data for a single test case that has been loaded in from the input file
+// This class contains the data for a single test case that is loaded in from the input file
 class TestCase {
 public:
     // Maximum number of turns allowed per round
@@ -21,10 +22,10 @@ public:
 
 };
 
-// Takes an input filename and returns a vector of TestCases
-std::vector<TestCase> get_file_data(const std::string &filename)
+// Takes an input filename and returns a List of TestCases
+std::list<TestCase> get_file_data(const std::string &filename)
 {
-    std::vector<TestCase> testCases;
+    std::list<TestCase> testCases;
 
     std::ifstream infile;
     infile.open(filename);
@@ -35,7 +36,6 @@ std::vector<TestCase> get_file_data(const std::string &filename)
     // First line is the number of test cases
     std::getline(infile, str);
 
-    testCases.reserve(std::stoi(str));
 
     // Temp testCase
     TestCase temp = TestCase();
@@ -54,7 +54,6 @@ std::vector<TestCase> get_file_data(const std::string &filename)
         if (line_num == 1) {
             // Get n
             iss >> buf;
-//            temp.n = std::stoi(buf);
 
             // Get num turns
             iss >> buf;
@@ -114,6 +113,7 @@ void max_score_solver(TestCase &testCase)
             int turn = 0;
             while (turn < max_turns && !testCase.pQueue.empty()) {
                 // Take a value off the queue for rusty
+//                std::cout << "Rusty grabs: " << testCase.pQueue.top_max_sum() << std::endl;
                 rusty_score += testCase.pQueue.top_max_sum();
                 testCase.pQueue.pop_max_sum();
 
@@ -128,6 +128,7 @@ void max_score_solver(TestCase &testCase)
             int turn = 0;
             while (turn < max_turns && !testCase.pQueue.empty()) {
                 // Take a value off the queue for scott
+//                std::cout << "Scott grabs: " << testCase.pQueue.top_max_value() << std::endl;
                 scott_score += testCase.pQueue.top_max_value();
                 testCase.pQueue.pop_max_value();
 
@@ -158,9 +159,20 @@ int main() {
         double microseconds = std::chrono::duration_cast<std::chrono::microseconds> (endClock - startClock).count();
 
         // Log time is the solver time plus the original push time
-        std::cout << "Solver runtime: " << (testCase.microseconds + microseconds)/1000000<< " seconds\n"  << std::endl;
+        std::cout << "Solver runtime: " << std::fixed << (testCase.microseconds + microseconds)/1000000<< " seconds\n"  << std::endl;
     }
 
+//    int c = 0;
+//    TestCase ca;
+//    std::list<TestCase> cas = get_file_data("input.txt");
+//
+//    for (auto ie : cas) {
+//
+//        if (c==7) {
+//            max_score_solver(ie);
+//        }
+//        c++;
+//    }
 
     return 0;
 }

@@ -30,7 +30,7 @@ void PriorityQueue::heapify_down_mNodes(const int &i)
     // Max index is the greatest value out of the current node at i and its child nodes
     int max_idx = i;
 
-    // Compare the node at i with its children ( .first is the value not the sum)
+    // Compare the node at i with its children ( .first is the value not the sum of digits)
     if (l_idx < mNodes.size() && mNodes[l_idx].first > mNodes[i].first)
         max_idx = l_idx;
 
@@ -54,13 +54,20 @@ void PriorityQueue::heapify_down_mSumNodes(const int &i)
     int max_idx = i;
 
     // Compare the node at i with its children ( .second is the sum of digits not the value)
-    if (l_idx < mSumNodes.size() && mSumNodes[l_idx].second > mSumNodes[i].second)
+    // If the sums of digits are equal, compare the values instead
+    if (l_idx < mSumNodes.size()
+    && (mSumNodes[l_idx].second > mSumNodes[i].second
+    || (mSumNodes[l_idx].second == mSumNodes[i].second
+    && mSumNodes[l_idx].first > mSumNodes[i].first)))
         max_idx = l_idx;
 
-    if (r_idx < mSumNodes.size() && mSumNodes[r_idx].second > mSumNodes[max_idx].second)
+    if (r_idx < mSumNodes.size()
+    && (mSumNodes[r_idx].second > mSumNodes[max_idx].second
+    || (mSumNodes[r_idx].second == mSumNodes[max_idx].second
+    && mSumNodes[r_idx].first > mSumNodes[max_idx].first)))
         max_idx = r_idx;
 
-    // If the the node a index i is not larger than its child, swap and recursively run down the tree
+    // If the the node at index i is not larger than its children, swap and recursively run down the tree
     if (max_idx != i) {
         std::swap(mSumNodes[i], mSumNodes[max_idx]);
         heapify_down_mSumNodes(max_idx);
@@ -87,13 +94,18 @@ void PriorityQueue::heapify_up_mSumNodes(const int &i)
     // Index of the nodes parent
     int p_idx = parent(i);
 
-    // Check if the node at index i has a parent that less than it
+    // Check if the node at index i has a parent's sum of digits that less than its sum of digits
     if (p_idx >= 0 && mSumNodes[p_idx].second < mSumNodes[i].second) {
         // Swap the parent and child
         std::swap(mSumNodes[i], mSumNodes[p_idx]);
 
         // Recursively call until the parent is greater than the current child
         heapify_up_mSumNodes(p_idx);
+
+    } else if (p_idx >= 0 && mSumNodes[p_idx].second == mSumNodes[i].second) {
+        // Sums are equal, compare and choose the largest value
+        if (mSumNodes[p_idx].first < mSumNodes[i].first)
+            std::swap(mSumNodes[i], mSumNodes[p_idx]);
     }
 }
 
@@ -133,7 +145,7 @@ void PriorityQueue::pop_max_value()
         // Get the top value from the mNodes heap
         std::pair<int,int> val = mNodes[0];
 
-        // Find the location of val in mSumNodes, iterating from end backward
+        // Find the location (index) of val in mSumNodes
         int i = std::find(mSumNodes.begin(), mSumNodes.end(), val) - mSumNodes.begin();
 
         // Consider i to be the root node of mSumNodes
@@ -162,7 +174,7 @@ void PriorityQueue::pop_max_sum()
         // Get the top value from the mSumNodes heap
         std::pair<int,int> val = mSumNodes[0];
 
-        // Find the location of val in mNodes
+        // Find the location (index) of val in mNodes
         int i = std::find(mNodes.begin(), mNodes.end(), val) - mNodes.begin();
 
         // Consider i to be the root node of mNodes
@@ -185,7 +197,7 @@ void PriorityQueue::pop_max_sum()
 void PriorityQueue::push(const int &val)
 {
     int temp = val;
-    // Calculate sum
+    // Calculate sum of digits
     int sum = 0;
     while (temp) {
         sum += temp % 10;

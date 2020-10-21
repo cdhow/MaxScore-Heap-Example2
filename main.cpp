@@ -36,7 +36,6 @@ std::list<TestCase> get_file_data(const std::string &filename)
     // First line is the number of test cases
     std::getline(infile, str);
 
-
     // Temp testCase
     TestCase temp = TestCase();
 
@@ -113,7 +112,6 @@ void max_score_solver(TestCase &testCase)
             int turn = 0;
             while (turn < max_turns && !testCase.pQueue.empty()) {
                 // Take a value off the queue for rusty
-//                std::cout << "Rusty grabs: " << testCase.pQueue.top_max_sum() << std::endl;
                 rusty_score += testCase.pQueue.top_max_sum();
                 testCase.pQueue.pop_max_sum();
 
@@ -128,7 +126,6 @@ void max_score_solver(TestCase &testCase)
             int turn = 0;
             while (turn < max_turns && !testCase.pQueue.empty()) {
                 // Take a value off the queue for scott
-//                std::cout << "Scott grabs: " << testCase.pQueue.top_max_value() << std::endl;
                 scott_score += testCase.pQueue.top_max_value();
                 testCase.pQueue.pop_max_value();
 
@@ -145,10 +142,18 @@ void max_score_solver(TestCase &testCase)
 
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+
+    // If no filename is given, prompt the user and exit program
+    if (argv[1] == nullptr) {
+        std::cerr << "Error: This Program requires a filename argument." << std::endl;
+        return 0;
+    }
+
+    std::string filename(argv[1]);
 
     // Run the algorithm for each Test Case
-    for (auto testCase : get_file_data("input.txt")) {
+    for (auto testCase : get_file_data(filename)) {
         // Track algorithm run time
         auto startClock = std::chrono::high_resolution_clock::now();
 
@@ -161,18 +166,6 @@ int main() {
         // Log time is the solver time plus the original push time
         std::cout << "Solver runtime: " << std::fixed << (testCase.microseconds + microseconds)/1000000<< " seconds\n"  << std::endl;
     }
-
-//    int c = 0;
-//    TestCase ca;
-//    std::list<TestCase> cas = get_file_data("input.txt");
-//
-//    for (auto ie : cas) {
-//
-//        if (c==7) {
-//            max_score_solver(ie);
-//        }
-//        c++;
-//    }
 
     return 0;
 }
